@@ -1,0 +1,14 @@
+/.env
+/vendor/
+/storage/logs/*.log
+/storage/cache/*
+/storage/exports/*
+/storage/uploads/*
+!/storage/logs/.gitkeep
+!/storage/cache/.gitkeep
+!/storage/exports/.gitkeep
+!/storage/uploads/.gitkeep
+/.phpunit.cache/
+test_db.php
+.DS_Store
+Thumbs.db
