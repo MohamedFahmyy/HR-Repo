@@ -255,7 +255,7 @@ $activeMenu = 'ess';
 <div class="modal fade" id="requestLeaveModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content border-0 shadow">
-            <form method="POST" action="<?= url('/leaves/request') ?>">
+            <form method="POST" action="<?= url('/ess/leave') ?>">
                 <?= csrf_field() ?>
                 <div class="modal-header border-0 pb-0">
                     <h5 class="modal-title fw-bold text-dark">تقديم طلب إجازة جديد</h5>
@@ -298,7 +298,7 @@ $activeMenu = 'ess';
 <div class="modal fade" id="requestCorrectionModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content border-0 shadow">
-            <form method="POST" action="<?= url('/attendance/adjustments/request') ?>">
+            <form method="POST" action="<?= url('/ess/adjustment') ?>">
                 <?= csrf_field() ?>
                 <div class="modal-header border-0 pb-0">
                     <h5 class="modal-title fw-bold text-dark">طلب تصحيح بصمة / حضور يدوي</h5>
@@ -309,14 +309,24 @@ $activeMenu = 'ess';
                         <label class="form-label small fw-semibold">تاريخ اليوم المراد تصحيحه</label>
                         <input type="date" name="date" class="form-control form-control-sm" value="<?= date('Y-m-d', strtotime('-1 day')) ?>" required>
                     </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">نوع الطلب / العذر</label>
+                        <select name="adjustment_type" class="form-select form-select-sm" required>
+                            <option value="missing_punch">بصمة مفقودة (نسيان البصمة / عطل في الجهاز)</option>
+                            <option value="manual_attendance">حضور ميداني / مهمة عمل خارجية</option>
+                            <option value="excused_late">تأخير بعذر مقبول وموثق</option>
+                            <option value="early_leave">انصراف مبكر بعذر طارئ</option>
+                            <option value="dispute">اعتراض على تقرير الحضور</option>
+                        </select>
+                    </div>
                     <div class="row g-2 mb-3">
                         <div class="col-6">
                             <label class="form-label small fw-semibold">وقت الدخول الفعلي</label>
-                            <input type="time" name="check_in" class="form-control form-control-sm">
+                            <input type="time" name="requested_check_in" class="form-control form-control-sm">
                         </div>
                         <div class="col-6">
                             <label class="form-label small fw-semibold">وقت الخروج الفعلي</label>
-                            <input type="time" name="check_out" class="form-control form-control-sm">
+                            <input type="time" name="requested_check_out" class="form-control form-control-sm">
                         </div>
                     </div>
                     <div class="mb-3">

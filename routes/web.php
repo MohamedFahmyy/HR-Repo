@@ -127,6 +127,7 @@ $router->group(['middleware' => [AuthMiddleware::class, CsrfMiddleware::class]],
 
     // Reports & Analytics
     $r->get('/reports', [ReportController::class, 'index']);
+    $r->get('/reports/export', [ReportController::class, 'export']);
 
     // System Settings & Audit Logs
     $r->get('/settings', [SettingsController::class, 'index']);
@@ -135,5 +136,8 @@ $router->group(['middleware' => [AuthMiddleware::class, CsrfMiddleware::class]],
     // Employee Self-Service (ESS)
     $r->get('/ess', [EmployeeSelfServiceController::class, 'index']);
     $r->post('/ess/leave', [EmployeeSelfServiceController::class, 'submitLeave']);
+    $r->post('/leaves/request', [EmployeeSelfServiceController::class, 'submitLeave']);
     $r->post('/ess/adjustment', [EmployeeSelfServiceController::class, 'submitAdjustment']);
+    $r->post('/attendance/adjustments/request', [EmployeeSelfServiceController::class, 'submitAdjustment']);
 });
+

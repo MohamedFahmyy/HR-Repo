@@ -19,7 +19,11 @@ function httpReq(string $method, string $url, ?array $postData = null, ?string $
     curl_setopt($ch, CURLOPT_URL, $url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
+    if ($method === 'POST') {
+        curl_setopt($ch, CURLOPT_POST, true);
+    } else {
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
+    }
     curl_setopt($ch, CURLOPT_HEADER, false);
     curl_setopt($ch, CURLOPT_TIMEOUT, 10);
 
@@ -155,10 +159,13 @@ $res = httpReq('GET', "{$baseUrl}/payroll/runs/1");
 assertTest("GET /payroll/runs/1 displays itemized salary run", $res['status'] === 200 && (str_contains($res['body'], 'الراتب') || str_contains($res['body'], 'RUN-')));
 
 // 9. Reports & Exports
-echo "\n[8] Testing Reports & Analytics...\n";
+echo "\n[8] Testing Reports & Analytics & CSV Export...\n";
 $res = httpReq('GET', "{$baseUrl}/reports?type=attendance");
 assertTest("GET /reports?type=attendance returns HTTP 200", $res['status'] === 200);
 assertTest("Reports view renders data rows", str_contains($res['body'], 'EMP-0001') || str_contains($res['body'], 'تقرير'));
+
+$exportRes = httpReq('GET', "{$baseUrl}/reports/export?type=attendance");
+assertTest("GET /reports/export returns HTTP 200 CSV", $exportRes['status'] === 200 && (str_contains($exportRes['body'], 'employee_code') || str_contains($exportRes['body'], 'date')));
 
 // 10. ZKTeco ADMS Push Endpoint
 echo "\n[9] Testing ZKTeco ADMS / iClock HTTP Push Protocol...\n";
@@ -186,6 +193,18 @@ assertTest("Employee logs in successfully", str_contains($empLogin['url'], '/das
 $essRes = httpReq('GET', "{$baseUrl}/ess");
 assertTest("GET /ess renders Employee Self-Service portal", $essRes['status'] === 200 && (str_contains($essRes['body'], 'فهد') || str_contains($essRes['body'], 'الذاتية') || str_contains($essRes['body'], 'الموظف')));
 assertTest("ESS displays employee leave balances and punch history", str_contains($essRes['body'], 'متبقي') || str_contains($essRes['body'], 'رصيد') || str_contains($essRes['body'], 'إجازة'));
+
+preg_match('/name="_csrf_token"\s+value="([^"]+)"/', $essRes['body'], $m);
+$essCsrf = $m[1] ?? '';
+$leaveSubmitRes = httpReq('POST', "{$baseUrl}/ess/leave", [
+    '_csrf_token' => $essCsrf,
+    'leave_type_id' => 1,
+    'start_date' => date('Y-m-d', strtotime('+7 days')),
+    'end_date' => date('Y-m-d', strtotime('+8 days')),
+    'reason' => 'Automated E2E ESS leave test request',
+]);
+assertTest("ESS POST /ess/leave submits leave request and redirects", $leaveSubmitRes['status'] === 200 || $leaveSubmitRes['status'] === 302);
+
 
 echo "\n====================================================\n";
 echo "   Test Results: {$passCount} Passed, {$failCount} Failed\n";

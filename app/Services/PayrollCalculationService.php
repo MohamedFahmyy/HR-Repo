@@ -93,7 +93,7 @@ class PayrollCalculationService
                 Database::execute(
                     "INSERT INTO `payslips` (`payroll_item_id`, `employee_id`, `period_id`, `payslip_number`, `issue_date`, `access_token`)
                      VALUES (:item_id, :emp_id, :period_id, :ps_num, :issue_date, :token)
-                     ON DUPLICATE KEY UPDATE `access_token` = VALUES(`access_token`)",
+                     ON DUPLICATE KEY UPDATE `payroll_item_id` = VALUES(`payroll_item_id`), `access_token` = VALUES(`access_token`), `issue_date` = VALUES(`issue_date`)",
                     [
                         'item_id' => $itemId,
                         'emp_id' => $emp['id'],
